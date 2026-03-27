@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вороново · Помним и гордимся</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Roboto', system-ui, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a3a3a 0%, #2a5a5a 50%, #1e3a3f 100%);
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(255, 215, 102, 0.3);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: float linear infinite;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.5;
+            }
+            90% {
+                opacity: 0.5;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .welcome-container {
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .welcome-card {
+            max-width: 800px;
+            width: 100%;
+            background: rgba(245, 239, 227, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 2rem;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            animation: fadeInUp 0.8s ease-out;
+            border: 1px solid rgba(230, 200, 160, 0.5);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, #2d5e5a 0%, #1e4a46 100%);
+            padding: 2.5rem 2rem;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 215, 102, 0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 0.5;
+            }
+            50% {
+                transform: scale(1.1);
+                opacity: 0.8;
+            }
+        }
+
+        .hero-icon {
+            font-size: 4rem;
+            color: #ffd966;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .hero-section h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-section .subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .content-section {
+            padding: 2.5rem;
+        }
+
+        .message {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .message h2 {
+            color: #2d5e5a;
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .message p {
+            color: #5f4a2e;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .message i {
+            color: #b8860b;
+            margin-right: 8px;
+        }
+
+        .facts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .fact-card {
+            background: white;
+            padding: 1.2rem;
+            border-radius: 1rem;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease;
+            border: 1px solid #e6d8c4;
+        }
+
+        .fact-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .fact-icon {
+            font-size: 2rem;
+            color: #2d5e5a;
+            margin-bottom: 0.8rem;
+        }
+
+        .fact-card h3 {
+            color: #2d5e5a;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .fact-card p {
+            color: #6f5e48;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+
+        .quote {
+            background: linear-gradient(135deg, #e8dccb, #dfd0bb);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            margin: 2rem 0;
+            text-align: center;
+            border-left: 4px solid #b5996b;
+        }
+
+        .quote i {
+            font-size: 1.5rem;
+            color: #b8860b;
+            margin-bottom: 0.5rem;
+            display: inline-block;
+        }
+
+        .quote p {
+            font-style: italic;
+            color: #2c4e48;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .quote-author {
+            margin-top: 0.8rem;
+            font-size: 0.85rem;
+            color: #5f4a2e;
+            font-weight: 600;
+        }
+
+        .test-rules {
+            background: #fff5e6;
+            border-radius: 1rem;
+            padding: 1.2rem;
+            margin: 1.5rem 0;
+            border: 1px solid #e6c8a0;
+        }
+
+        .test-rules h4 {
+            color: #c41e3a;
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .test-rules ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .test-rules li {
+            margin-bottom: 0.5rem;
+            color: #5f4a2e;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .test-rules li i {
+            width: 20px;
+            color: #2d5e5a;
+        }
+
+        .start-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            width: 100%;
+            padding: 1.2rem;
+            background: linear-gradient(135deg, #2d5e5a 0%, #1e4a46 100%);
+            color: white;
+            border: none;
+            border-radius: 1rem;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1.5rem;
+            text-decoration: none;
+        }
+
+        .start-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            background: linear-gradient(135deg, #3a7a74 0%, #2a5a56 100%);
+        }
+
+        .start-btn:active {
+            transform: translateY(0);
+        }
+
+        .start-btn i {
+            font-size: 1.3rem;
+            transition: transform 0.3s ease;
+        }
+
+        .start-btn:hover i {
+            transform: translateX(5px);
+        }
+
+        .footer {
+            background: #e7dccc;
+            padding: 1rem;
+            text-align: center;
+            font-size: 0.75rem;
+            color: #5e6b5c;
+        }
+
+        @media (max-width: 550px) {
+            .hero-section h1 {
+                font-size: 1.8rem;
+            }
+            
+            .content-section {
+                padding: 1.5rem;
+            }
+            
+            .message h2 {
+                font-size: 1.4rem;
+            }
+            
+            .facts-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .start-btn {
+                padding: 1rem;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="particles" id="particles"></div>
+    
+    <div class="welcome-container">
+        <div class="welcome-card">
+            <div class="hero-section">
+                <div class="hero-icon">
+                    <i class="fas fa-map-location-dot"></i>
+                </div>
+                <h1>Вороново</h1>
+                <div class="subtitle">Земля, хранящая память</div>
+            </div>
+            
+            <div class="content-section">
+                <div class="message">
+                    <h2>
+                        <i class="fas fa-heart" style="color: #c41e3a;"></i>
+                        Дорогой друг!
+                        <i class="fas fa-heart" style="color: #c41e3a;"></i>
+                    </h2>
+                    <p>
+                        <i class="fas fa-clock"></i> Добро пожаловать в виртуальное путешествие по памятным местам посёлка Вороново.
+                    </p>
+                    <p>
+                        Здесь вы сможете <strong>узнать</strong> о героических страницах истории, <strong>увидеть</strong> на карте места памяти 
+                        и <strong>проверить</strong> свои знания в увлекательном тесте.
+                    </p>
+                    <p style="font-weight: 600; color: #2d5e5a; margin-top: 1rem;">
+                        <i class="fas fa-leaf"></i> Помнить — значит не допустить, чтобы прошлое было забыто.
+                    </p>
+                </div>
+                
+                <div class="test-rules">
+                    <h4><i class="fas fa-gamepad"></i> Правила теста:</h4>
+                    <ul>
+                        <li><i class="fas fa-question-circle"></i> Вам будет задано 6 вопросов о памятниках</li>
+                        <li><i class="fas fa-heart"></i> У вас есть 4 жизни</li>
+                        <li><i class="fas fa-times-circle"></i> За каждый неправильный ответ -1 жизнь</li>
+                        <li><i class="fas fa-trophy"></i> Пройдите все вопросы, чтобы получить победу!</li>
+                        <li><i class="fas fa-book-open"></i> Внимательно читайте информацию на карте</li>
+                    </ul>
+                </div>
+                
+                <div class="facts-grid">
+                    <div class="fact-card">
+                        <div class="fact-icon">
+                            <i class="fas fa-monument"></i>
+                        </div>
+                        <h3>6 памятных мест</h3>
+                        <p>На карте отмечены важные исторические объекты Вороново</p>
+                    </div>
+                    <div class="fact-card">
+                        <div class="fact-icon">
+                            <i class="fas fa-pencil-alt"></i>
+                        </div>
+                        <h3>Проверь знания</h3>
+                        <p>Тест с 8 жизнями — ответь правильно на все вопросы</p>
+                    </div>
+                    <div class="fact-card">
+                        <div class="fact-icon">
+                            <i class="fas fa-map-marked-alt"></i>
+                        </div>
+                        <h3>Интерактивная карта</h3>
+                        <p>Исследуй памятники, читай описание перед тестом</p>
+                    </div>
+                </div>
+                
+                <div class="quote">
+                    <i class="fas fa-quote-left"></i>
+                    <p>Никто не забыт, ничто не забыто. Пока мы помним — мы живём.</p>
+                    <div class="quote-author">— Из военных хроник</div>
+                </div>
+                
+                <a href="map.html" class="start-btn">
+                    <span>Начать путешествие</span>
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            
+            <div class="footer">
+                <i class="fas fa-map-marker-alt"></i> Вороново, Гродненская область | Память поколений
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 50;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                const size = Math.random() * 8 + 2;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${Math.random() * 100}%`;
+                const duration = Math.random() * 10 + 5;
+                particle.style.animationDuration = `${duration}s`;
+                particle.style.animationDelay = `${Math.random() * 10}s`;
+                particlesContainer.appendChild(particle);
+            }
+        }
+        
+        createParticles();
+        
+        window.addEventListener('load', () => {
+            const card = document.querySelector('.welcome-card');
+            card.style.animation = 'fadeInUp 0.8s ease-out';
+        });
+    </script>
+</body>
+</html>

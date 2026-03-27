@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Вороново · Проверка знаний</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            font-family: 'Segoe UI', 'Roboto', system-ui, sans-serif;
+            background: #1e3a3f;
+        }
+
+        .test-wrapper {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            background: radial-gradient(circle at 20% 30%, #2a5a5a, #1a3a3a);
+            position: relative;
+        }
+
+        /* Индикатор жизней в левом верхнем углу */
+        .lives-container {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            padding: 10px 20px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 1000;
+            border: 1px solid #ffd966;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .lives-label {
+            color: white;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .lives-hearts {
+            display: flex;
+            gap: 5px;
+        }
+
+        .heart {
+            color: #ff4444;
+            font-size: 1.4rem;
+            transition: all 0.3s ease;
+        }
+
+        .heart.lost {
+            color: #666;
+            filter: grayscale(0.5);
+            opacity: 0.5;
+        }
+
+        /* Кнопка выхода */
+        .exit-test-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            padding: 10px 20px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            border: 1px solid #ff6666;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .exit-test-btn:hover {
+            background: rgba(200, 50, 50, 0.8);
+            transform: scale(1.05);
+        }
+
+        /* Увеличенная карточка теста */
+        .test-card {
+            max-width: 900px;
+            width: 100%;
+            background: #f5efe3;
+            border-radius: 2rem;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .test-header {
+            background: #2d5e5a;
+            padding: 1.8rem 2rem;
+            border-bottom: 4px solid #e6c8a0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: white;
+        }
+
+        .test-header i {
+            font-size: 2.2rem;
+            color: #ffd966;
+        }
+
+        .test-header h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .test-header p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-top: 4px;
+        }
+
+        .progress-bar {
+            background: #cfb99a;
+            height: 8px;
+            width: 100%;
+        }
+
+        .progress-fill {
+            background: #2d5e5a;
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .test-body {
+            padding: 2.5rem;
+        }
+
+        .monument-card {
+            background: linear-gradient(135deg, #e8dccb, #dfd0bb);
+            border-radius: 1.2rem;
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+            border-left: 6px solid #b5996b;
+        }
+
+        .monument-name {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .monument-name i {
+            font-size: 1.8rem;
+            color: #2d5e5a;
+            background: white;
+            padding: 10px;
+            border-radius: 50%;
+        }
+
+        .monument-name h3 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #2c4e48;
+        }
+
+        .monument-type {
+            display: inline-block;
+            background: #2d5e5a;
+            color: white;
+            padding: 0.4rem 1.2rem;
+            border-radius: 2rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+
+        .counter {
+            text-align: right;
+            color: #5f4a2e;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .question-box {
+            margin-bottom: 2rem;
+        }
+
+        .question-label {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #5f4a2e;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .question-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2c3e2f;
+            background: white;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            border: 1px solid #cfb99a;
+            line-height: 1.4;
+        }
+
+        .answer-box {
+            margin-bottom: 2rem;
+        }
+
+        .answer-box label {
+            display: block;
+            font-weight: 600;
+            color: #5f4a2e;
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+
+        .answer-input {
+            width: 100%;
+            padding: 1.2rem;
+            font-size: 1.1rem;
+            border: 2px solid #cfb99a;
+            border-radius: 1rem;
+            background: white;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .answer-input:focus {
+            border-color: #2d5e5a;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: space-between;
+        }
+
+        .btn {
+            padding: 1rem 1.8rem;
+            border: none;
+            border-radius: 2rem;
+            font-weight: 700;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: inherit;
+        }
+
+        .btn-check {
+            background: #2d5e5a;
+            color: white;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .btn-check:hover:not(:disabled) {
+            background: #3f7a74;
+            transform: translateY(-2px);
+        }
+
+        .btn-check:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Модальные окна увеличенные */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            visibility: hidden;
+            opacity: 0;
+            transition: 0.2s;
+        }
+
+        .modal.active {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: #fef9ef;
+            max-width: 500px;
+            width: 90%;
+            border-radius: 2rem;
+            text-align: center;
+            overflow: hidden;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #2d5e5a;
+        }
+
+        .modal-body {
+            padding: 1rem 2rem 2rem;
+            color: #2c3e4f;
+            font-size: 1.1rem;
+            line-height: 1.5;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            padding: 0 1.5rem 1.8rem;
+        }
+
+        .modal-btn {
+            padding: 0.8rem 1.8rem;
+            border-radius: 2rem;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .modal-btn-primary {
+            background: #2d5e5a;
+            color: white;
+        }
+
+        .modal-btn-primary:hover {
+            background: #3f7a74;
+            transform: translateY(-2px);
+        }
+
+        .modal-btn-secondary {
+            background: #cfb99a;
+            color: #2d2b24;
+        }
+
+        .modal-btn-secondary:hover {
+            background: #b5996b;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 550px) {
+            .test-body {
+                padding: 1.5rem;
+            }
+            .question-text {
+                font-size: 1.1rem;
+                padding: 1rem;
+            }
+            .monument-name h3 {
+                font-size: 1.1rem;
+            }
+            .buttons {
+                flex-direction: column;
+            }
+            .lives-container {
+                top: 10px;
+                left: 10px;
+                padding: 5px 12px;
+            }
+            .exit-test-btn {
+                top: 10px;
+                right: 10px;
+                padding: 5px 12px;
+                font-size: 0.8rem;
+            }
+            .modal-header {
+                font-size: 1.4rem;
+                padding: 1rem;
+            }
+            .modal-body {
+                padding: 0.8rem 1.2rem 1.2rem;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="test-wrapper">
+        <!-- Индикатор жизней -->
+        <div class="lives-container">
+            <span class="lives-label"><i class="fas fa-heart"></i> Жизни:</span>
+            <div class="lives-hearts" id="livesHearts"></div>
+        </div>
+
+        <!-- Кнопка выхода -->
+        <div class="exit-test-btn" id="exitTestBtn">
+            <i class="fas fa-sign-out-alt"></i> Выйти
+        </div>
+
+        <div class="test-card">
+            <div class="test-header">
+                <i class="fas fa-pencil-alt"></i>
+                <div>
+                    <h2>Исторический тест</h2>
+                    <p>Проверь свои знания о памятниках Вороново</p>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+
+            <div class="test-body">
+                <div class="counter" id="questionCounter">Вопрос 1 из 6</div>
+                
+                <div class="monument-card">
+                    <div class="monument-name">
+                        <i class="fas fa-monument" id="monumentIcon"></i>
+                        <h3 id="monumentName">Загрузка...</h3>
+                    </div>
+                    <span class="monument-type" id="monumentType">Памятник</span>
+                </div>
+
+                <div class="question-box">
+                    <div class="question-label">
+                        <i class="fas fa-question-circle"></i>
+                        <span>Вопрос:</span>
+                    </div>
+                    <div class="question-text" id="questionText">
+                        Загрузка вопроса...
+                    </div>
+                </div>
+
+                <div class="answer-box">
+                    <label><i class="fas fa-edit"></i> Ваш ответ:</label>
+                    <input type="text" id="answerInput" class="answer-input" placeholder="Введите ответ..." autocomplete="off">
+                </div>
+
+                <div class="buttons">
+                    <button class="btn btn-check" id="checkBtn">
+                        <i class="fas fa-check-circle"></i> Проверить
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальные окна -->
+    <div id="exitModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <i class="fas fa-exclamation-triangle" style="color: #e67e22;"></i> Выход из теста
+            </div>
+            <div class="modal-body">
+                <p>⚠️ Внимание! ⚠️</p>
+                <p style="margin-top: 10px;">Если вы выйдете, весь прогресс будет потерян.</p>
+                <p>Придётся начинать тест заново.</p>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-secondary" id="cancelExitBtn">Остаться</button>
+                <button class="modal-btn modal-btn-primary" id="confirmExitBtn">Выйти</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="failModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <i class="fas fa-times-circle" style="color:#b33a3a;"></i> Неправильно!
+            </div>
+            <div class="modal-body">
+                <p>❌ К сожалению, ответ неверный.</p>
+                <p style="font-size: 1.2rem; margin-top: 10px;"><strong>-1 жизнь</strong></p>
+                <p style="margin-top: 10px;">Внимательнее читайте информацию о памятнике на карте!</p>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-primary" id="continueFailBtn">Продолжить</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <i class="fas fa-trophy" style="color:#f3b33d;"></i> Правильно!
+            </div>
+            <div class="modal-body">
+                <p>✨ Отлично! ✨</p>
+                <p style="margin-top: 10px;">Вы правильно ответили на вопрос!</p>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-primary" id="continueSuccessBtn">Следующий вопрос</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="gameOverModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <i class="fas fa-skull-crossbones" style="color:#b33a3a;"></i> Поражение!
+            </div>
+            <div class="modal-body">
+                <p>💔 У вас закончились жизни! 💔</p>
+                <p style="margin-top: 10px;">К сожалению, вы не смогли пройти тест.</p>
+                <p>Внимательно изучите информацию о памятниках на карте и попробуйте снова!</p>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-primary" id="gameOverBtn">Вернуться на карту</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="finalWinModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <i class="fas fa-crown" style="color:#ffd700;"></i> Победа!
+            </div>
+            <div class="modal-body">
+                <p>🏆 Поздравляем! 🏆</p>
+                <p style="margin-top: 10px;">Вы успешно прошли все вопросы!</p>
+                <p>Вы отлично знаете историю памятников Вороново!</p>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-primary" id="finalWinBtn">Вернуться на карту</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // БАЗА ДАННЫХ ВОПРОСОВ
+        const monumentsData = {
+            2: {
+                name: "Захоронение жертв войн (юго-запад)",
+                type: "Захоронение",
+                question: "Сколько жителей было расстреляно и захоронено на юго-западной окраине Вороново?",
+                answer: "1834",
+                icon: "fa-cross"
+            },
+            3: {
+                name: "Захоронение жертв войн (северо-восток)",
+                type: "Захоронение",
+                question: "Сколько жителей Вильнюса было расстреляно у железнодорожной станции Вороново 14 ноября 1941 года?",
+                answer: "800",
+                icon: "fa-cross"
+            },
+            4: {
+                name: "Улица в честь Т.Я. Литовчика",
+                type: "Улица",
+                question: "Какое воинское звание было у Тихона Яковлевича Литовчика, в честь которого названа улица?",
+                answer: "полковник",
+                icon: "fa-road"
+            },
+            5: {
+                name: "Памятник А. Канарчику",
+                type: "Памятник",
+                question: "В каком году был установлен памятник Александру Канарчику возле Вороновской средней школы?",
+                answer: "2009",
+                icon: "fa-star-of-life"
+            },
+            6: {
+                name: "Воинское захоронение в центре поселка",
+                type: "Захоронение",
+                question: "Сколько воинов и партизан захоронено в братской могиле в центре Вороново?",
+                answer: "192",
+                icon: "fa-shield-alt"
+            },
+            7: {
+                name: "Памятник Ленину",
+                type: "Памятник",
+                question: "В честь какой годовщины Великой Октябрьской революции был установлен памятник Ленину в Вороново?",
+                answer: "107",
+                icon: "fa-user"
+            }
+        };
+
+        // Порядок прохождения теста (ID памятников по порядку)
+        const testOrder = [2, 3, 4, 5, 6, 7];
+        
+        let currentIndex = 0;
+        let lives = 4; // 4 жизни
+        let testProgress = [];
+        
+        // DOM элементы
+        const monumentNameEl = document.getElementById('monumentName');
+        const monumentTypeEl = document.getElementById('monumentType');
+        const monumentIconEl = document.getElementById('monumentIcon');
+        const questionTextEl = document.getElementById('questionText');
+        const answerInput = document.getElementById('answerInput');
+        const checkBtn = document.getElementById('checkBtn');
+        const questionCounter = document.getElementById('questionCounter');
+        const progressFill = document.getElementById('progressFill');
+        const livesHearts = document.getElementById('livesHearts');
+        
+        // Модальные окна
+        const exitModal = document.getElementById('exitModal');
+        const failModal = document.getElementById('failModal');
+        const successModal = document.getElementById('successModal');
+        const gameOverModal = document.getElementById('gameOverModal');
+        const finalWinModal = document.getElementById('finalWinModal');
+        
+        const cancelExitBtn = document.getElementById('cancelExitBtn');
+        const confirmExitBtn = document.getElementById('confirmExitBtn');
+        const continueFailBtn = document.getElementById('continueFailBtn');
+        const continueSuccessBtn = document.getElementById('continueSuccessBtn');
+        const gameOverBtn = document.getElementById('gameOverBtn');
+        const finalWinBtn = document.getElementById('finalWinBtn');
+        const exitTestBtn = document.getElementById('exitTestBtn');
+
+        // Обновление отображения жизней
+        function updateLivesDisplay() {
+            livesHearts.innerHTML = '';
+            for (let i = 0; i < 4; i++) {
+                const heart = document.createElement('i');
+                heart.className = `fas fa-heart heart ${i >= lives ? 'lost' : ''}`;
+                livesHearts.appendChild(heart);
+            }
+        }
+
+        // Обновление прогресса
+        function updateProgress() {
+            const progress = (currentIndex / testOrder.length) * 100;
+            progressFill.style.width = `${progress}%`;
+            questionCounter.textContent = `Вопрос ${currentIndex + 1} из ${testOrder.length}`;
+        }
+
+        // Загрузка текущего вопроса
+        function loadCurrentQuestion() {
+            const monumentId = testOrder[currentIndex];
+            const data = monumentsData[monumentId];
+            
+            if (data) {
+                monumentNameEl.textContent = data.name;
+                monumentTypeEl.textContent = data.type;
+                monumentIconEl.className = `fas ${data.icon}`;
+                questionTextEl.textContent = data.question;
+            } else {
+                monumentNameEl.textContent = "Ошибка загрузки";
+                questionTextEl.textContent = "Данные не найдены";
+            }
+            
+            answerInput.value = '';
+            answerInput.disabled = false;
+            checkBtn.disabled = false;
+            answerInput.focus();
+            updateProgress();
+        }
+
+        // Проверка ответа
+        function checkAnswer() {
+            const userAnswer = answerInput.value.trim().toLowerCase();
+            const monumentId = testOrder[currentIndex];
+            const correctAnswer = monumentsData[monumentId].answer.toLowerCase();
+            
+            if (userAnswer === "") {
+                alert("Пожалуйста, введите ответ");
+                return;
+            }
+            
+            if (userAnswer === correctAnswer) {
+                successModal.classList.add('active');
+            } else {
+                lives--;
+                updateLivesDisplay();
+                
+                if (lives <= 0) {
+                    gameOverModal.classList.add('active');
+                } else {
+                    failModal.classList.add('active');
+                }
+            }
+        }
+
+        // Переход к следующему вопросу
+        function nextQuestion() {
+            currentIndex++;
+            
+            if (currentIndex >= testOrder.length) {
+                finalWinModal.classList.add('active');
+            } else {
+                loadCurrentQuestion();
+            }
+        }
+
+        // Сброс теста и выход на карту
+        function resetAndExit() {
+            window.location.href = 'map.html';
+        }
+
+        function closeAllModals() {
+            exitModal.classList.remove('active');
+            failModal.classList.remove('active');
+            successModal.classList.remove('active');
+            gameOverModal.classList.remove('active');
+            finalWinModal.classList.remove('active');
+        }
+
+        function init() {
+            updateLivesDisplay();
+            loadCurrentQuestion();
+            
+            checkBtn.addEventListener('click', checkAnswer);
+            exitTestBtn.addEventListener('click', () => exitModal.classList.add('active'));
+            
+            confirmExitBtn.addEventListener('click', resetAndExit);
+            cancelExitBtn.addEventListener('click', closeAllModals);
+            
+            continueSuccessBtn.addEventListener('click', () => {
+                closeAllModals();
+                nextQuestion();
+            });
+            
+            continueFailBtn.addEventListener('click', () => {
+                closeAllModals();
+                answerInput.value = '';
+                answerInput.focus();
+            });
+            
+            gameOverBtn.addEventListener('click', resetAndExit);
+            finalWinBtn.addEventListener('click', resetAndExit);
+            
+            answerInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    checkAnswer();
+                }
+            });
+            
+            window.addEventListener('click', (e) => {
+                if (e.target.classList.contains('modal')) closeAllModals();
+            });
+        }
+        
+        init();
+    </script>
+</body>
+</html>
